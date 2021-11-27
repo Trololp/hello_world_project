@@ -1,13 +1,13 @@
 #include <avr/io.h>
 
 #define LED PB6
-#define BLINK_DELAY_MS 1000
 #define F_CPU 16000000
 
 #include <util/delay.h>
 #include <avr/pgmspace.h>
 
 #define MSG_ADDR 0x4000
+
 #define DOT_DELAY 700
 #define LINE_DELAY 3*DOT_DELAY
 #define SYMBOL_DELAY 3*DOT_DELAY
@@ -75,28 +75,25 @@ void symbol_to_delay_code(char symbol, morze_t* ops)
 
 void string_2_morze_seq(char* str)
 {
-  int i = 0;
   
-  while(*str != 0 && i < 16)
+  while(*str != 0)
   {
-    if(*str == ' ') {_delay_ms(WORD_DELAY); str++; i++; continue;}
+    if(*str == ' ') {_delay_ms(WORD_DELAY); str++; continue;}
 
     morze_t code;
     symbol_to_delay_code(*str, &code);
     int code_2[4] = {code.op0, code.op1, code.op2, code.op3};
 
-    for(int j = 0; j < 4; j++) {
-      if(code_2[j] == 3) break;
+    for(int i = 0; i < 4; i++) {
+      if (code_2[i] == 3) break;
 
-      if(code_2[j] == 0) {PORTB |= (1 << LED); _delay_ms(DOT_DELAY); PORTB &= ~(1 << LED);}
-      else if (code_2[j] == 1) {PORTB |= (1 << LED); _delay_ms(LINE_DELAY); PORTB &= ~(1 << LED);}
+      if (code_2[i] == 0) {PORTB |= (1 << LED); _delay_ms(DOT_DELAY) ; PORTB &= ~(1 << LED);}
+      if (code_2[i] == 1) {PORTB |= (1 << LED); _delay_ms(LINE_DELAY); PORTB &= ~(1 << LED);}
 
       _delay_ms(DOT_DELAY);
     }
 
     str++;
-    i++;
-    PORTB &= ~(1 << LED);
     _delay_ms(SYMBOL_DELAY);
   }
   
@@ -106,9 +103,11 @@ int main(void)
 {
 	DDRB |= (1 << LED);
 	
+	_delay_ms(1000);
+	
 	char msg[16];
 	msg[15] = '\0';
-	
+
 	strcpy_P(msg, MSG_ADDR);
 	string_2_morze_seq(msg);
 }
