@@ -99,6 +99,20 @@ void string_2_morze_seq(char* str)
   
 }
 
+void strcpy_P_s(unsigned char* dest, uint16_t from_addr, uint16_t size_of_buffer)
+{
+	uint16_t i = 0;
+	unsigned char b_ch = pgm_read_byte(from_addr + i);
+	
+	while(b_ch != '\0' && i < size_of_buffer)
+	{
+		b_ch = pgm_read_byte(from_addr + i);
+		*dest = b_ch;
+		dest++;
+		i++;
+	}
+}
+
 int main(void)
 {
 	DDRB |= (1 << LED);
@@ -106,8 +120,10 @@ int main(void)
 	_delay_ms(1000);
 	
 	char msg[16];
-	msg[15] = '\0';
 
-	strcpy_P(msg, MSG_ADDR);
+	strcpy_P_s(msg, MSG_ADDR, sizeof(msg));
+	
+	msg[15] = '\0';
+	
 	string_2_morze_seq(msg);
 }
