@@ -10,8 +10,8 @@
 
 #define DOT_DELAY 700
 #define LINE_DELAY 3*DOT_DELAY
-#define SYMBOL_DELAY 3*DOT_DELAY
-#define WORD_DELAY 7*DOT_DELAY
+#define SYMBOL_DELAY 2*DOT_DELAY // 3 - 1
+#define WORD_DELAY 4*DOT_DELAY // 7 - 3
 
 #define MYMEM __attribute__((section(".mymem")))
 const char g_message[16] MYMEM = "HELLO WORLD";
@@ -78,7 +78,7 @@ void string_2_morze_seq(char* str)
   
   while(*str != 0)
   {
-    if(*str == ' ') {_delay_ms(WORD_DELAY); str++; continue;}
+    if(*str == ' ') {_delay_ms(WORD_DELAY); str++; continue;} // 4pt (1pt + 2pt + 4pt = 7pt)
 
     morze_t code;
     symbol_to_delay_code(*str, &code);
@@ -87,14 +87,14 @@ void string_2_morze_seq(char* str)
     for(int i = 0; i < 4; i++) {
       if (code_2[i] == 3) break;
 
-      if (code_2[i] == 0) {PORTB |= (1 << LED); _delay_ms(DOT_DELAY) ; PORTB &= ~(1 << LED);}
-      if (code_2[i] == 1) {PORTB |= (1 << LED); _delay_ms(LINE_DELAY); PORTB &= ~(1 << LED);}
+      if (code_2[i] == 0) {PORTB |= (1 << LED); _delay_ms(DOT_DELAY) ; PORTB &= ~(1 << LED);} // 1pt
+      if (code_2[i] == 1) {PORTB |= (1 << LED); _delay_ms(LINE_DELAY); PORTB &= ~(1 << LED);} // 3pt
 
-      _delay_ms(DOT_DELAY);
+      _delay_ms(DOT_DELAY); // 1pt
     }
 
     str++;
-    _delay_ms(SYMBOL_DELAY);
+    _delay_ms(SYMBOL_DELAY); // 2pt (1pt + 2pt = 3pt)
   }
   
 }
